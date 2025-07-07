@@ -136,6 +136,58 @@
 | Render         | バックエンドホスティング     |
 | Vercel         | フロントエンドホスティング   |
 
+### 🐳 docker-compose.yml（開発用）構成
+
+```yml
+services:
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    command: bash -c "bundle exec rails db:prepare && rails s"
+    volumes:
+      - ./backend:/app
+      - bundle_data:/usr/local/bundle
+      - ./certs:/certs
+    ports:
+      - 3000:3000
+    environment:
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+    depends_on:
+      - db
+    tty: true
+    stdin_open: true
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  frontend:
+    container_name: frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./frontend:/home/node/app
+      - ./certs:/home/node/app/certs
+    ports:
+      - 5173:5173
+
+volumes:
+  bundle_data:
+  postgres_data:
+  ```
+
 ### 🧰 開発ツール・テスト
 
 | ツール          | バージョン | 用途                      |
@@ -167,6 +219,9 @@
 
 #### 🛠️ 技術刷新
 - **TypeScriptへの移行** - フロントエンドコードの型安全性向上と保守性強化
+
+#### 🛡️ セキュリティ
+- **CI/CDパイプライン強化** - 自動テスト、デプロイメント最適化
 
 #### 📱 UI/UX改善・最適化
 - **レスポンシブデザインの完全対応** - モバイルファースト設計への移行
@@ -201,10 +256,7 @@
 - **AI機能強化** - 音声レシピ読み上げ
 - **収益化戦略** - プレミアム機能、アフィリエイト、データ販売
 
-### 🔧 インフラ強化
 
-#### 🛡️ セキュリティ
-- **CI/CDパイプライン強化** - 自動テスト、デプロイメント最適化
 
 ## 🗂️ ER図
 
